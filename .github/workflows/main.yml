@@ -19,7 +19,6 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
-          p0rt: 22
           script: |
             set -e
             echo "======================================"
