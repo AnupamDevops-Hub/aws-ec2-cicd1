@@ -1,42 +1,46 @@
-const http = require("http");
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-const PORT = process.env.PORT || 3000;
-const APP_ENV = process.env.APP_ENV || "production";
+  - name: Deploy to EC2
+    uses: appleboy/ssh-action@v1.2.0
+    with:
+      host: ${{ secrets.EC2_HOST }}
+      username: ec2-user
+      key: ${{ secrets.EC2_SSH_KEY }}
 
-const server = http.createServer((req, res) => {
-    res.writeHead(200, {
-        "Content-Type": "text/html"
-    });
+      script: |
+        set -e
 
-    res.end(`
-        <h1>hiii kaka  ${APP_ENV} env ITCAMPUSGURU </h1>
-        <p>Application deployed using GitHub Actions → AWS EC2</p>
-        <p>Environment: <strong>${APP_ENV}</strong></p>
-    `);
-});
+        echo "======================================"
+        echo "Starting deployment..."
+        echo "======================================"
 
-server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Environment: ${APP_ENV}`);
-});
+        cd /home/ec2-user/node-cicd-demo/aws-ec2-cicd1
 
+        echo "1. Getting latest code..."
+        git fetch origin main
+        git reset --hard origin/main
+        git clean -fd
 
-// const express = require("express");
+        echo "2. Checking deployed commit..."
+        git rev-parse HEAD
+        git log -1 --oneline
 
-// const app = express();
+        echo "3. Installing dependencies..."
+        npm install
 
-// const PORT = process.env.PORT || 3000;
-// const ENV = process.env.APP_ENV || "DEV";
+        echo "4. Restarting PM2 application..."
 
-// app.get("/", (req, res) => {
-//   res.send(`Hello Team - Environment: ${ENV}`);
-// });
+        if pm2 describe node-cicd-demo > /dev/null 2>&1; then
+            pm2 restart node-cicd-demo --update-env
+        else
+            pm2 start app.js --name node-cicd-demo
+        fi
 
-// app.get("/health", (req, res) => {
-//   res.status(200).send("OK");
-// });
+        pm2 save
 
-// app.listen(PORT, () => {
-//   console.log(`Application running on port ${PORT}`);
-// });
+        echo "5. Checking PM2 status..."
+        pm2 status
 
+        echo "6. Deployment completed successfully!"
