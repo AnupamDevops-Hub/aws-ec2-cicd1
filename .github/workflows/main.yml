@@ -1,1 +1,49 @@
+name: Node.js CI
 
+on:
+  push:
+    branches:
+      - main
+      - master
+
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Get the source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Run lint if available
+      - name: Run lint
+        run: npm run lint --if-present
+
+      # 5. Run tests if available
+      - name: Run tests
+        run: npm test --if-present
+
+      # 6. Build application if build script exists
+      - name: Build application
+        run: npm run build --if-present
+
+      # 7. CI completed
+      - name: CI Success
+        run: echo "Node.js CI pipeline completed successfully!"
