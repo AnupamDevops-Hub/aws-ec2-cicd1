@@ -44,7 +44,7 @@ jobs:
             set -e
 
             # Navigate to the application directory on EC2
-            /home/ec2-user/aws-ec2-cicd1
+            /home/ec2-user/node-cicd-demo/aws-ec2-cicd1
 
             # Pull latest changes from GitHub
             git pull origin main
