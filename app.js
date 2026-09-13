@@ -9,7 +9,7 @@ const server = http.createServer((req, res) => {
     });
 
     res.end(`
-        <h1>gola me gola    ${APP_ENV} ITCAMPUSGURU </h1>
+        <h1>bheem ki shakti ${APP_ENV} ITCAMPUSGURU </h1>
         <p>Application deployed using GitHub Actions → AWS EC2</p>
         <p>Environment: <strong>${APP_ENV}</strong></p>
     `);
